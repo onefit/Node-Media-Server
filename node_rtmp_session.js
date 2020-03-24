@@ -1001,6 +1001,8 @@ class NodeRtmpSession {
   }
 
   onPublish(invokeMessage) {
+    console.log('invokeMessage', invokeMessage);
+
     if (typeof invokeMessage.streamName !== "string") {
       return;
     }
@@ -1051,7 +1053,7 @@ class NodeRtmpSession {
     this.playStreamPath = "/" + this.appname + "/" + invokeMessage.streamName.split("?")[0];
     this.playArgs = QueryString.parse(invokeMessage.streamName.split("?")[1]);
     this.playStreamId = this.parserPacket.header.stream_id;
-    context.nodeEvent.emit("prePlay", this.id, this.playStreamPath, this.playArgs);
+    // context.nodeEvent.emit("prePlay", this.id, this.playStreamPath, this.playArgs);
 
     if (!this.isStarting) {
       return;

@@ -62,7 +62,20 @@ class NodeHttpServer {
     }
 
     app.use(Express.static(path.join(__dirname + '/public')));
+
+    app.use((req, res, next) => {
+      if (req.originalUrl.endsWith('index.m3u8')) {
+        console.log('handling index.m3u8');
+        const ip = req.socket.remoteAddress;
+        console.log('emit prePlayHLS');
+        context.nodeEvent.emit("prePlayHLS", null, req.originalUrl.split('/live/')[1], { ip });
+      }
+
+      next();
+    });
+
     app.use(Express.static(this.mediaroot));
+    
     if (config.http.webroot) {
       app.use(Express.static(config.http.webroot));
     }
@@ -173,7 +186,6 @@ class NodeHttpServer {
   onConnect(req, res) {
     let session = new NodeFlvSession(this.config, req, res);
     session.run();
-
   }
 }
 
