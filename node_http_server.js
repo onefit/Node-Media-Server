@@ -65,9 +65,7 @@ class NodeHttpServer {
 
     app.use((req, res, next) => {
       if (req.originalUrl.endsWith('index.m3u8')) {
-        console.log('handling index.m3u8');
         const ip = req.socket.remoteAddress;
-        console.log('emit prePlayHLS');
         context.nodeEvent.emit("prePlayHLS", null, req.originalUrl.split('/live/')[1], { ip });
       }
 
