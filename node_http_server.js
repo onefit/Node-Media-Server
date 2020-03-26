@@ -19,6 +19,7 @@ const HTTPS_PORT = 443;
 const HTTP_MEDIAROOT = './media';
 const Logger = require('./node_core_logger');
 const context = require('./node_core_ctx');
+const cors = require('cors')
 
 const streamsRoute = require('./api/routes/streams');
 const serverRoute = require('./api/routes/server');
@@ -32,13 +33,16 @@ class NodeHttpServer {
 
     let app = Express();
 
-    app.all('*', (req, res, next) => {
-      res.header("Access-Control-Allow-Origin", this.config.http.allow_origin);
-      res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
-      res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-      res.header("Access-Control-Allow-Credentials", true);
-      req.method === "OPTIONS" ? res.sendStatus(200) : next();
-    });
+    app.use(cors());
+    console.log('CORS enabled');
+
+    // app.all('*', (req, res, next) => {
+    //   res.header("Access-Control-Allow-Origin", this.config.http.allow_origin);
+    //   res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
+    //   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+    //   res.header("Access-Control-Allow-Credentials", true);
+    //   req.method === "OPTIONS" ? res.sendStatus(200) : next();
+    // });
 
     app.get('*.flv', (req, res, next) => {
       req.nmsConnectionType = 'http';
