@@ -56,8 +56,9 @@ class NodeTransSession extends EventEmitter {
       Logger.log('[Transmuxing DASH] ' + this.conf.streamPath + ' to ' + ouPath + '/' + dashFileName);
     }
     mkdirp.sync(ouPath);
-    let argv = ['-y', '-fflags', 'nobuffer'];
+    let argv = [];
     Array.prototype.push.apply(argv, customFlags);
+    Array.prototype.push.apply(argv, ['-y', '-fflags', 'nobuffer']);
     Array.prototype.push.apply(argv, ['-i', inPath]);
     Array.prototype.push.apply(argv, ['-c:v', vc]);
     Array.prototype.push.apply(argv, this.conf.vcParam);
