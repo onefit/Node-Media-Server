@@ -20,6 +20,7 @@ class NodeTransSession extends EventEmitter {
   run() {
     let vc = this.conf.vc || 'copy';
     let ac = this.conf.ac || 'copy';
+    let customFlags = this.conf.customFlags || '';
     let inPath = 'rtmp://127.0.0.1:' + this.conf.rtmpPort + this.conf.streamPath;
     let ouPath = `${this.conf.mediaroot}/${this.conf.streamApp}/${this.conf.streamName}`;
     let mapStr = '';
@@ -55,7 +56,9 @@ class NodeTransSession extends EventEmitter {
       Logger.log('[Transmuxing DASH] ' + this.conf.streamPath + ' to ' + ouPath + '/' + dashFileName);
     }
     mkdirp.sync(ouPath);
-    let argv = ['-y', '-fflags', 'nobuffer', '-i', inPath];
+    let argv = ['-y', '-fflags', 'nobuffer'];
+    Array.prototype.push.apply(argv, customFlags);
+    Array.prototype.push.apply(argv, ['-i', inPath]);
     Array.prototype.push.apply(argv, ['-c:v', vc]);
     Array.prototype.push.apply(argv, this.conf.vcParam);
     Array.prototype.push.apply(argv, ['-c:a', ac]);
