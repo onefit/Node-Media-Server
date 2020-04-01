@@ -1001,8 +1001,6 @@ class NodeRtmpSession {
   }
 
   onPublish(invokeMessage) {
-    console.log('invokeMessage', invokeMessage);
-
     if (typeof invokeMessage.streamName !== "string") {
       return;
     }

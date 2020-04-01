@@ -19,7 +19,7 @@ const HTTPS_PORT = 443;
 const HTTP_MEDIAROOT = './media';
 const Logger = require('./node_core_logger');
 const context = require('./node_core_ctx');
-const cors = require('cors')
+const cors = require('cors');
 
 const streamsRoute = require('./api/routes/streams');
 const serverRoute = require('./api/routes/server');
@@ -30,6 +30,11 @@ class NodeHttpServer {
     this.port = config.http.port || HTTP_PORT;
     this.mediaroot = config.http.mediaroot || HTTP_MEDIAROOT;
     this.config = config;
+
+    // handlers
+    this.handlers = {
+      prePlayHLS: null,
+    };
 
     let app = Express();
 
@@ -67,13 +72,15 @@ class NodeHttpServer {
 
     app.use(Express.static(path.join(__dirname + '/public')));
 
-    app.use((req, res, next) => {
-      if (req.originalUrl.endsWith('index.m3u8')) {
-        const ip = req.socket.remoteAddress;
-        context.nodeEvent.emit("prePlayHLS", null, req.originalUrl.split('/live/')[1], { ip });
+    app.use(async (req, res, next) => {
+      if (req.originalUrl.includes('index.m3u8')) {
+        if (this.handlers.prePlayHLS) {
+          const ip = req.socket.remoteAddress;
+          this.handlers.prePlayHLS(null, req.originalUrl.split('/live/')[1], { ip }, { req, res, next });
+        }
+      } else {
+        next();
       }
-
-      next();
     });
 
     app.use(Express.static(this.mediaroot));
@@ -99,6 +106,11 @@ class NodeHttpServer {
       this.sport = config.https.port ? config.https.port : HTTPS_PORT;
       this.httpsServer = Https.createServer(options, app);
     }
+  }
+
+  registerHandler(event, fn) {
+    this.handlers[event] = fn;
+    console.log(`Registered "${event}" handler`);
   }
 
   run() {
